@@ -7,7 +7,7 @@ from app.core.client import create_es_client, check_es_health
 from app.search import ensure_blog_index
 from app.db.database import engine
 
-logger = get_logger("infra.lifespan")
+logger = get_logger(__name__)
 settings = get_settings()
 
 

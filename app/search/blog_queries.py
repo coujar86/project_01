@@ -36,18 +36,16 @@ def build_blog_query(
         must_query = {
             "bool": {
                 "should": [
-                    {"match_phrase": {"title": {"query": q, "boost": 5}}},
+                    {"match_phrase": {"title": {"query": q, "boost": 4}}},
                     {
                         "multi_match": {
                             "query": q,
-                            "fields": ["title^3", "content"],
+                            "fields": ["title^2", "content"],
                             "type": "best_fields",
-                            "operator": "or",
+                            "minimum_should_match": "75%",
                         }
                     },
-                    {"match": {"title.ngram": {"query": q, "boost": 1.2}}},
-                ],
-                "minimum_should_match": 1,
+                ]
             }
         }
     elif search_type == "author":

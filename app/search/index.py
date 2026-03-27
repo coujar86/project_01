@@ -4,17 +4,11 @@ from elasticsearch import AsyncElasticsearch
 BLOG_INDEX_CONFIG = {
     "settings": {
         "analysis": {
-            "filter": {"ngram_filter": {"type": "ngram", "min_gram": 2, "max_gram": 3}},
             "tokenizer": {
                 "nori_tokenizer": {"type": "nori_tokenizer", "decompound_mode": "mixed"}
             },
             "analyzer": {
                 "korean_analyzer": {"type": "custom", "tokenizer": "nori_tokenizer"},
-                "korean_ngram_analyzer": {
-                    "type": "custom",
-                    "tokenizer": "standard",
-                    "filter": ["lowercase", "ngram_filter"],
-                },
             },
         },
         "number_of_shards": 1,
@@ -28,7 +22,6 @@ BLOG_INDEX_CONFIG = {
                 "analyzer": "korean_analyzer",
                 "fields": {
                     "keyword": {"type": "keyword"},
-                    "ngram": {"type": "text", "analyzer": "korean_ngram_analyzer"},
                 },
             },
             "content": {"type": "text", "analyzer": "korean_analyzer"},

@@ -12,7 +12,7 @@ from app.core.context import (
 import time
 
 
-logger = get_logger("infra.db")
+logger = get_logger(__name__)
 settings = get_settings()
 
 engine = create_async_engine(

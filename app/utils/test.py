@@ -5,7 +5,7 @@ from app.core.logging import get_logger
 from faker import Faker
 
 
-logger = get_logger("test")
+logger = get_logger(__name__)
 fake = Faker("ko_KR")
 
 

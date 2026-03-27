@@ -10,7 +10,7 @@ from app.core.context import (
 )
 import uuid
 
-logger = get_logger("api_db")
+logger = get_logger(__name__)
 settings = get_settings()
 
 

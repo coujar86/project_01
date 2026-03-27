@@ -15,7 +15,7 @@ from app.search.blog_sync import convert_blog_to_document
 from app.utils.test import create_dummies
 
 
-logger = get_logger("debug")
+logger = get_logger(__name__)
 router = APIRouter(prefix="/debug", tags=["debug"])
 
 

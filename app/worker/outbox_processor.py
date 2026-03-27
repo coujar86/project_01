@@ -14,7 +14,7 @@ BATCH_SIZE = 3
 RESET_SECONDS = 10
 CLEANUP_SECONDS = 20
 
-logger = get_logger("outbox")
+logger = get_logger(__name__)
 
 
 async def _event_processing(
@@ -129,3 +129,4 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 # python -m app.worker.outbox_processor
+# uvicorn main:app --port=8080 --reload

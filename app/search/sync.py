@@ -7,7 +7,7 @@ from app.core.logging import get_logger
 from app.utils.util import extract_image_ext
 
 
-logger = get_logger("infra.search")
+logger = get_logger(__name__)
 
 
 async def _blogs_stream_action(
