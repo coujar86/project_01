@@ -60,7 +60,7 @@ def build_blog_query(
             }
         }
     else:
-        raise ValueError("Invalid search_type")
+        raise ValueError()
 
     return {
         "bool": {
