@@ -21,7 +21,7 @@ class OutboxCrud:
 
     @staticmethod
     async def claim_events(
-        db: AsyncSession, batch_size: int = 3
+        db: AsyncSession, batch_size: int = 10
     ) -> list[tuple[int, str, int, dict | None]]:
         """batch_size 이하의 이벤트 선점 및 이벤트 id 리스트 반환"""
         result = await db.execute(
@@ -79,7 +79,7 @@ class OutboxCrud:
 
     @staticmethod
     async def mark_failed_event(
-        db: AsyncSession, event_ids: list[int], base: int = 1, max_delay: int = 20
+        db: AsyncSession, event_ids: list[int], base: int = 1, max_delay: int = 60
     ) -> int:
         """이벤트를 실패하면 status를 FAILED으로 설정하고 재시도 기준 설정"""
         if not event_ids:
@@ -94,7 +94,7 @@ class OutboxCrud:
                 locked_at=None,
                 retry_count=Outbox.retry_count + 1,
                 next_retry_at=func.timestampadd(
-                    literal_column("SECOND"), delay_minutes, func.now()
+                    literal_column("MINUTE"), delay_minutes, func.now()
                 ),
             )
         )
@@ -102,7 +102,7 @@ class OutboxCrud:
         return result.rowcount
 
     @staticmethod
-    async def reset_blocked_event(db: AsyncSession, stale_seconds: int = 20) -> int:
+    async def reset_blocked_event(db: AsyncSession, stale_minutes: int = 5) -> int:
         """status가 PROCESSING이고 locked_at이 stale_minutes 이상인 이벤트 회수"""
         result = await db.execute(
             update(Outbox)
@@ -111,7 +111,7 @@ class OutboxCrud:
                 Outbox.locked_at.isnot(None),
                 Outbox.locked_at
                 < func.timestampadd(
-                    literal_column("SECOND"), -stale_seconds, func.now()
+                    literal_column("MINUTE"), -stale_minutes, func.now()
                 ),
             )
             .values(
@@ -125,7 +125,7 @@ class OutboxCrud:
         return result.rowcount
 
     @staticmethod
-    async def clean_done_event(db: AsyncSession, stale_seconds: int = 20) -> int:
+    async def clean_done_event(db: AsyncSession, stale_minutes: int = 60) -> int:
         """status가 DONE이고 processed_at이 stale_minutes 이상인 이벤트 제거"""
         result = await db.execute(
             delete(Outbox).where(
@@ -133,7 +133,7 @@ class OutboxCrud:
                 Outbox.processed_at.isnot(None),
                 Outbox.processed_at
                 < func.timestampadd(
-                    literal_column("SECOND"), -stale_seconds, func.now()
+                    literal_column("MINUTE"), -stale_minutes, func.now()
                 ),
             )
         )

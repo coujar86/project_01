@@ -9,10 +9,10 @@ import signal
 import time
 
 
-SLEEP_SECONDS = 1.0
-BATCH_SIZE = 3
-RESET_SECONDS = 10
-CLEANUP_SECONDS = 20
+SLEEP_SECONDS = 5
+BATCH_SIZE = 10
+RESET_SECONDS = 15
+CLEANUP_SECONDS = 30
 
 logger = get_logger(__name__)
 
@@ -75,16 +75,12 @@ async def _house_keeping_loop(stop_: asyncio.Event):
             if time.monotonic() - last_reset >= RESET_SECONDS:
                 async with AsyncSessionLocal() as session:
                     async with session.begin():
-                        reset_num = await OutboxCrud.reset_blocked_event(
-                            session, stale_seconds=30
-                        )
+                        reset_num = await OutboxCrud.reset_blocked_event(session)
                 last_reset = time.monotonic()
             if time.monotonic() - last_cleanup >= CLEANUP_SECONDS:
                 async with AsyncSessionLocal() as session:
                     async with session.begin():
-                        clean_done_num = await OutboxCrud.clean_done_event(
-                            session, stale_seconds=30
-                        )
+                        clean_done_num = await OutboxCrud.clean_done_event(session)
                         clean_failed_num = await OutboxCrud.clean_failed_event(session)
                         if clean_failed_num:
                             logger.error(f"[CLEAN FAILED] removed={clean_failed_num}")

@@ -33,6 +33,5 @@ async def upsert_es_document(es: AsyncElasticsearch, document: dict) -> None:
 
 async def delete_es_document(es: AsyncElasticsearch, blog_id: int) -> None:
     await es.delete(
-        index=settings.elasticsearch_index_blogs,
-        id=str(blog_id),
+        index=settings.elasticsearch_index_blogs, id=str(blog_id), ignore=[404]
     )
