@@ -28,8 +28,3 @@ app.add_exception_handler(SQLAlchemyError, exc_handler.sqlalchemy_exception_hand
 app.add_exception_handler(
     RequestValidationError, exc_handler.validation_exception_handler
 )
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    pass

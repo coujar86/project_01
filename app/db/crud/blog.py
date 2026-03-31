@@ -47,7 +47,6 @@ class BlogCrud:
 
     @staticmethod
     async def get_by_id(db: AsyncSession, id: int) -> Blog | None:
-        # async 세션에서는 관계 lazy 로드가 MissingGreenlet을 유발할 수 있음 → 항상 eager load
         result = await db.execute(
             select(Blog).where(Blog.id == id).options(selectinload(Blog.author))
         )
@@ -58,7 +57,6 @@ class BlogCrud:
         blog = Blog(**blog_data.model_dump())
         db.add(blog)
         await db.flush()
-        # server_default(예: modified_dt)가 DB에만 있으면 flush 후 인스턴스에 없을 수 있음 → lazy SELECT 유발
         await db.refresh(blog)
         return blog
 

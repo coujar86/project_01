@@ -36,13 +36,14 @@ class BlogService:
     async def get_all_blogs(
         db: AsyncSession, *, page: int, per_page: int
     ) -> Sequence[BlogRead]:
+        """목록 페이지 조회"""
         blogs = await BlogCrud.get_page(db, page, per_page)
         return [BlogService._build_blog_read(blog, is_preview=True) for blog in blogs]
 
     @staticmethod
     async def get_blog_by_id(db: AsyncSession, *, id: int) -> BlogRead:
+        """단일 페이지 글 조회"""
         blog = await BlogCrud.get_by_id(db, id)
-
         if blog is None:
             raise HTTPException(detail="블로그 글 없음", status_code=404)
 
@@ -61,7 +62,6 @@ class BlogService:
     ) -> tuple[list, int, int]:
         if not 1 <= page <= settings.MAX_PAGE:
             raise HTTPException(detail="페이지 범위 오류", status_code=400)
-
         try:
             df = util.parse_query_date_start(date_from)
             dt = util.parse_query_date_end(date_to)
@@ -165,8 +165,6 @@ class BlogService:
 
     @staticmethod
     async def _delete_uploaded_image(image_loc: str | None) -> None:
-        # Delete uploaded file if this blog uses an uploaded image URL.
-        # image_loc is expected to be a web path like: /static/uploads/{author}/{filename}
         if (
             image_loc
             and isinstance(image_loc, str)
@@ -176,15 +174,12 @@ class BlogService:
             file_path = settings.upload_dir_path / rel
             upload_root = settings.upload_dir_path.resolve()
             if upload_root not in file_path.parents and file_path != upload_root:
-                logger.warning("Refusing to delete outside upload dir: %s", file_path)
                 return
             try:
                 if await aios.path.exists(file_path):
                     await aios.remove(file_path)
             except OSError as e:
-                logger.warning(
-                    f"Failed to delete uploaded image file: {file_path} ({e})"
-                )
+                pass
 
     @staticmethod
     async def delete_blog(db: AsyncSession, *, user_id: int, id: int) -> None:
@@ -206,11 +201,13 @@ class BlogService:
 
     @staticmethod
     def _check_blog_owner(user_id: int, author_id: int) -> None:
+        """사용자의 id가 블로그 글 작성자 id와 동일한지 확인"""
         if user_id != author_id:
             raise HTTPException(detail="권한 없음", status_code=403)
 
     @staticmethod
     def _build_blog_read(blog: Blog, is_preview: bool) -> BlogRead:
+        """목록 페이지일 경우 content 글자수를 생략하여 표시, 단일 페이지일 경우 content를 그대로 표시"""
         if is_preview:
             content = util.truncate_text(blog.content)
         else:

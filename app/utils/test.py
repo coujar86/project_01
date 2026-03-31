@@ -10,7 +10,7 @@ fake = Faker("ko_KR")
 
 
 async def create_dummies(db: AsyncSession, n: int = 1000) -> list[int]:
-    """더미 블로그 n개 생성 후 생성된 블로그 id 목록 반환."""
+    """더미 블로그 n개 생성 후 생성된 블로그 id 목록 반환"""
     user = await db.scalar(select(User).limit(1))
     if user is None:
         user = User(

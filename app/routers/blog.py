@@ -1,4 +1,3 @@
-from typing import Literal
 from elasticsearch import AsyncElasticsearch
 from fastapi import (
     HTTPException,
