@@ -20,6 +20,7 @@ from app.db.schemas import BlogCreate, BlogUpdate
 from app.auth.dependencies import get_user_id, get_user_id_optional
 from app.core.client import get_es
 from app.services.blog import BlogService
+from app.utils.timer import ElapsedTime
 
 settings = get_settings()
 router = APIRouter(prefix="/blogs", tags=["blogs"])
@@ -99,15 +100,16 @@ async def search_blogs(
     q = q.strip()
 
     try:
-        blogs, total_pages, current_page = await BlogService.search_blogs(
-            es,
-            q=q,
-            search_type=search_type,
-            image_ext=image_ext,
-            date_from=date_from,
-            date_to=date_to,
-            page=page,
-        )
+        async with ElapsedTime("router.blog.search_blogs"):
+            blogs, total_pages, current_page = await BlogService.search_blogs(
+                es,
+                q=q,
+                search_type=search_type,
+                image_ext=image_ext,
+                date_from=date_from,
+                date_to=date_to,
+                page=page,
+            )
         return templates.TemplateResponse(
             request=request,
             name="index.html",

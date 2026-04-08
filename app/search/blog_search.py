@@ -7,7 +7,7 @@ from app.utils import util
 settings = get_settings()
 
 ES_PAGE_SIZE = settings.BLOGS_PER_PAGE
-ES_SORT_LATEST = [{"modified_dt": {"order": "desc"}}, {"id": {"order": "desc"}}]
+# ES_SORT_LATEST = [{"modified_dt": {"order": "desc"}}, {"id": {"order": "desc"}}]
 ES_SOURCE_FIELDS = [
     "id",
     "title",
@@ -57,7 +57,7 @@ async def _search_execute(
     response = await es.search(
         index=settings.elasticsearch_index_blogs,
         query=query,
-        sort=ES_SORT_LATEST,
+        # sort=ES_SORT_LATEST,
         from_=from_,
         size=ES_PAGE_SIZE,
         track_total_hits=True,
